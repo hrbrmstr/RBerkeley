@@ -3,13 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "db.h"
+/* #include "db.h" */
+#include "config.h"
+#include DB_HEADER
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
 
 /* RBerkeley: Mutexes and Related Methods */
- 
+
 /* Mutexes and Related Methods */
 /* {{{ rberkeley_dbenv_mutex_alloc */
 SEXP rberkeley_dbenv_mutex_alloc (SEXP _dbenv, SEXP _flags)
@@ -74,10 +76,10 @@ SEXP rberkeley_dbenv_mutex_stat_print (SEXP _dbenv, SEXP _flags)
   dbenv = R_ExternalPtrAddr(_dbenv);
   if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
     error("invalid 'dbenv' handle");
- 
+
   ret = dbenv->mutex_stat_print(dbenv, flags);
 
-  return ScalarInteger(ret); 
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_mutex_unlock */

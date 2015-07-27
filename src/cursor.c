@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "db.h"
+/* #include "db.h" */
+#include "config.h"
+#include DB_HEADER
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
@@ -81,15 +83,15 @@ SEXP rberkeley_dbcursor_del (SEXP _dbc, SEXP _flags)
   DBC *dbc;
   u_int32_t flags;
   int ret;
-  
+
   dbc = R_ExternalPtrAddr(_dbc);
   if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
     error("invalid 'dbc' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
-  
+
   ret = dbc->del(dbc, flags);
 
-  return ScalarInteger(ret); 
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* {{{ rberkeley_dbcursor_dup */
@@ -138,11 +140,11 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
   PROTECT(Keys = allocVector(VECSXP, n)); P++;
   PROTECT(Data = allocVector(VECSXP, n)); P++;
   PROTECT(results = allocVector(VECSXP, n)); P++;
-  
+
   /*
     Two scenarios for DBcursor->get calls:
     (1) key and data are SPECIFIED <OR> key is SPECIFIED, data is EMPTY
-    (2) key and data are EMPTY 
+    (2) key and data are EMPTY
 
     We must handle these seperately in order
     to return a sensible result
@@ -176,7 +178,7 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
       memcpy(RAW(rawdata), data.data, data.size);
       SET_VECTOR_ELT(KeyData, 1, rawdata);
       UNPROTECT(1);
-      
+
       SEXP KeyDataNames;
       PROTECT(KeyDataNames = allocVector(STRSXP,2)); P++;
       SET_STRING_ELT(KeyDataNames, 0, mkChar("key"));
@@ -185,7 +187,7 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
       SET_VECTOR_ELT(results, 0, KeyData);
       PROTECT(results = lengthgets(results, 1)); P++;
     }
-  } else 
+  } else
   if(isNull(_key) && isNull(_data)) {
     for(i = 0; i < n; i++) {
       ret = dbc->get(dbc, &key, &data, flags);
@@ -241,7 +243,7 @@ SEXP rberkeley_dbcursor_put (SEXP _dbc, SEXP _key, SEXP _data, SEXP _flags)
      flags != DB_KEYLAST &&
      flags != DB_NODUPDATA) {
     error("incorrect flags value");
-  } 
+  }
   dbc = R_ExternalPtrAddr(_dbc);
   if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
     error("invalid 'dbc' handle");
@@ -251,7 +253,7 @@ SEXP rberkeley_dbcursor_put (SEXP _dbc, SEXP _key, SEXP _data, SEXP _flags)
 
   key.data = (unsigned char *)RAW(_key);
   key.size = length(_key);
-  
+
   data.data = (unsigned char *)RAW(_data);
   data.size = length(_data);
 
@@ -290,7 +292,7 @@ SEXP rberkeley_dbcursor_get_priority (SEXP _dbc)
 
   ret = dbc->get_priority(dbc, &priority);
 
-  if(ret != 0) 
+  if(ret != 0)
     return ScalarInteger(ret);
 
   switch(priority) {

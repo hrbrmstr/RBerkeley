@@ -1,0 +1,11 @@
+This package relies on the Oracle Berkeley DB library being present on the system.
+
+http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html
+
+on debian-ish:
+
+sudo apt-get install libdb-dev
+
+on os x:
+
+brew install berkeley-db

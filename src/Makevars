@@ -1,0 +1,3 @@
+PKG_CPPFLAGS= -Wall -mtune=core2 -g -O2   -DNDEBUG -g
+PKG_LIBS=   -ldb
+

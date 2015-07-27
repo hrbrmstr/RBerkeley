@@ -3,7 +3,9 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
-#include "db.h"
+/* #include "db.h" */
+#include "config.h"
+#include DB_HEADER
 
 SEXP rberkeley_check_pointer (SEXP _dbh)
 {

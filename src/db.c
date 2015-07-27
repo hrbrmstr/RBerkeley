@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "db.h"
+/* #include "db.h" */
+#include "config.h"
+#include DB_HEADER
 #include "RBerkeley.h"
 #include <R.h>
 #include <Rinternals.h>

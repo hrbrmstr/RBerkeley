@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "db.h"
+/* #include "db.h" */
+#include "config.h"
+#include DB_HEADER
 #include "RBerkeley.h"
 #include <R.h>
 #include <Rinternals.h>
@@ -23,7 +25,7 @@ SEXP rberkeley_dbenv_txn_stat_print (SEXP _dbenv, SEXP _flags) {
     error("invalid 'dbenv' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
 
-  ret = dbenv->txn_stat_print(dbenv, flags);  
+  ret = dbenv->txn_stat_print(dbenv, flags);
   return ScalarInteger(ret);
 }
 /* }}} */
@@ -53,7 +55,7 @@ SEXP rberkeley_dbenv_txn_begin (SEXP _dbenv, SEXP _parent, SEXP _flags) {
   if(ret != 0)
     return ScalarInteger(ret);
 
-  return R_MakeExternalPtr(tid, install("DB_TXN"), ScalarLogical(TRUE));   
+  return R_MakeExternalPtr(tid, install("DB_TXN"), ScalarLogical(TRUE));
 }
 /* }}} */
 /* {{{ rberkeley_dbtxn_abort */
@@ -84,7 +86,7 @@ SEXP rberkeley_dbtxn_commit (SEXP _tid, SEXP _flags) {
   flags = (u_int32_t)INTEGER(_flags)[0];
 
   ret = tid->commit(tid, flags);
-    
+
   warning("'txnid' may not be accessed again");
   R_ClearExternalPtr(_tid);
 
@@ -103,7 +105,7 @@ SEXP rberkeley_dbtxn_id (SEXP _tid) {
 
   ret = tid->id(tid);
   Rprintf("%i, %x\n", ret, ret);
-  
+
   return ScalarInteger(ret);
 }
 /* }}} */

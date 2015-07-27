@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "db.h"
+/* #include "db.h" */
+#include "config.h"
+#include DB_HEADER
 #include "RBerkeley.h"
 #include <R.h>
 #include <Rinternals.h>
@@ -72,7 +74,7 @@ SEXP rberkeley_dbenv_dbremove (SEXP _dbenv, SEXP _txnid, SEXP _file,
   DB_TXN *txnid;
   u_int32_t flags;
   int ret;
-  
+
   dbenv = R_ExternalPtrAddr(_dbenv);
   if(R_ExternalPtrTag(_dbenv) != RBerkeley_DB_ENV || dbenv == NULL)
     error("invalid 'dbenv' handle");
@@ -96,7 +98,7 @@ SEXP rberkeley_dbenv_dbrename (SEXP _dbenv, SEXP _txnid, SEXP _file,
   DB_TXN *txnid;
   u_int32_t flags;
   int ret;
-  
+
   dbenv = R_ExternalPtrAddr(_dbenv);
   if(R_ExternalPtrTag(_dbenv) != RBerkeley_DB_ENV || dbenv == NULL)
     error("invalid 'dbenv' handle");
@@ -138,7 +140,7 @@ SEXP rberkeley_dbenv_get_open_flags (SEXP _dbenv)
   DB_ENV *dbenv;
   u_int32_t flags;
   int ret;
-  
+
   dbenv = R_ExternalPtrAddr(_dbenv);
   if(R_ExternalPtrTag(_dbenv) != RBerkeley_DB_ENV || dbenv == NULL)
     error("invalid 'dbenv' handle");
@@ -267,7 +269,7 @@ SEXP rberkeley_dbenv_set_data_dir (SEXP _dbenv, SEXP _dir)
     error("invalid 'dbenv' handle");
   ret = dbenv->set_data_dir(dbenv, CHAR(STRING_ELT(_dir, 0)));
 
-  return ScalarInteger(ret); 
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_get_data_dirs */
@@ -282,10 +284,10 @@ SEXP rberkeley_dbenv_get_data_dirs (SEXP _dbenv)
     error("invalid 'dbenv' handle");
   ret = dbenv->get_data_dirs(dbenv, &dirpp);
 
-  if(ret != 0) 
-    return ScalarInteger(ret); 
+  if(ret != 0)
+    return ScalarInteger(ret);
 
-  return mkString(*dirpp);  
+  return mkString(*dirpp);
 }
 /* }}} */
 /* rberkeley_dbenv_set_encrypt */
@@ -313,7 +315,7 @@ SEXP rberkeley_dbenv_set_flags (SEXP _dbenv, SEXP _flags, SEXP _onoff)
 
   ret = dbenv->set_flags(dbenv, flags, onoff);
 
-  return ScalarInteger(ret);  
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_get_flags */
@@ -346,7 +348,7 @@ SEXP rberkeley_dbenv_set_intermediate_dir_mode (SEXP _dbenv, SEXP _mode)
     error("invalid 'dbenv' handle");
   ret = dbenv->set_intermediate_dir_mode (dbenv, CHAR(STRING_ELT(_mode, 0)));
 
-  return ScalarInteger(ret); 
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_get_intermediate_dir_mode */
@@ -361,10 +363,10 @@ SEXP rberkeley_dbenv_get_intermediate_dir_mode (SEXP _dbenv)
     error("invalid 'dbenv' handle");
   ret = dbenv->get_intermediate_dir_mode(dbenv, &modep);
 
-  if(ret != 0) 
-    return ScalarInteger(ret); 
+  if(ret != 0)
+    return ScalarInteger(ret);
 
-  return mkString(modep);  
+  return mkString(modep);
 }
 /* }}} */
 /* rberkeley_dbenv_set_rpc_server */
@@ -379,7 +381,7 @@ SEXP rberkeley_dbenv_set_shm_key (SEXP _dbenv, SEXP _shm_key)
   if(R_ExternalPtrTag(_dbenv) != RBerkeley_DB_ENV || dbenv == NULL)
     error("invalid 'dbenv' handle");
   shm_key = (long)INTEGER(_shm_key); /* would be better if we had longs in R ... atol? */
-  
+
   ret = dbenv->set_shm_key(dbenv, shm_key);
   return ScalarInteger(ret);
 }
@@ -390,7 +392,7 @@ SEXP rberkeley_dbenv_get_shm_key (SEXP _dbenv)
   DB_ENV *dbenv;
   long shm_key;
   int ret;
-  
+
   dbenv = R_ExternalPtrAddr(_dbenv);
   if(R_ExternalPtrTag(_dbenv) != RBerkeley_DB_ENV || dbenv == NULL)
     error("invalid 'dbenv' handle");
@@ -399,7 +401,7 @@ SEXP rberkeley_dbenv_get_shm_key (SEXP _dbenv)
   if(ret != 0)
     return ScalarInteger(ret);
 
-  return ScalarInteger((int)shm_key);  
+  return ScalarInteger((int)shm_key);
 }
 /* }}} */
 /* rberkeley_dbenv_set_thread_id */
@@ -418,7 +420,7 @@ SEXP rberkeley_dbenv_set_tmp_dir (SEXP _dbenv, SEXP _dir)
     error("invalid 'dbenv' handle");
   ret = dbenv->set_tmp_dir(dbenv, CHAR(STRING_ELT(_dir, 0)));
 
-  return ScalarInteger(ret); 
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_get_tmp_dir */
@@ -433,10 +435,10 @@ SEXP rberkeley_dbenv_get_tmp_dir (SEXP _dbenv)
     error("invalid 'dbenv' handle");
   ret = dbenv->get_tmp_dir(dbenv, &dirp);
 
-  if(ret != 0) 
-    return ScalarInteger(ret); 
+  if(ret != 0)
+    return ScalarInteger(ret);
 
-  return mkString(dirp);  
+  return mkString(dirp);
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_set_verbose */
