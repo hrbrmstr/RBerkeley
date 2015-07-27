@@ -4,8 +4,20 @@ http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/over
 
 on debian-ish:
 
-sudo apt-get install libdb-dev
+  sudo apt-get install libdb-dev
 
 on os x:
 
-brew install berkeley-db
+  brew install berkeley-db
+
+CentOS/RedHat require some additional work:
+
+  sudo yum install libdb4-devel
+
+and ensure:
+
+  export LD_LIBRARY_PATH=/usr/lib64/libdb4
+  export LDFLAGS=-L/usr/lib64/libdb0-04
+  export CPPFLAGS=-I/usr/include/libdb4
+
+are in the environment before configuring/building
