@@ -1,0 +1,10 @@
+## set by configure
+#DB_CFLAGS  = @DB_CFLAGS@
+#DB_LIBS    = @DB_LIBS@
+#
+## combine to standard arguments for R
+#PKG_CFLAGS = -W $(DB_CFLAGS) 
+#PKG_LIBS   = $(DB_LIBS) 
+PKG_CPPFLAGS = 
+PKG_LIBS = -L/usr/local/lib64 -ldb
+

@@ -1,0 +1,108 @@
+# Configuration file based on RMySQL package configure.in
+# written by J Horner.
+# Additional insight provided by Dirk Eddelbuettel.
+# All bad form/function is solely the work of Jeff Ryan
+
+AC_INIT(RBerkeley, 0.7-0)
+
+AC_PROG_CC
+
+AC_CHECK_LIB(c,getopt_long,
+             HAVE_GETOPT_LONG="yes",
+             HAVE_GETOPT_LONG="no")
+
+AC_CHECK_LIB(db,
+             HAVE_BDB_LIB="yes",
+             HAVE_BDB_LIB="")
+
+AC_CHECK_HEADERS(db.h,
+                 HAVE_BDB_INC="yes",
+                 HAVE_BDB_INC="")
+
+AC_ARG_WITH(berkeleydb-dir,
+            [--with-berkeleydb-dir=BDB_DIR specifies existing Berkeley DB base dir],
+            BDB_DIR="${with_berkeleydb_dir}")
+AC_ARG_WITH(berkeleydb-inc,
+            [--with-berkeleydb-inc=BDB_INC specifies existing Berkeley DB include dir],
+            BDB_INC="${with_berkeleydb_inc}")
+AC_ARG_WITH(berkeleydb-lib,
+            [--with-berkeleydb-lib=BDB_LIB specifies existing Berkeley DB lib dir],
+            BDB_LIB="${with_berkeleydb_lib}")
+
+test "${BDB_DIR}" = "yes" -o "${BDB_DIR}" = "no" && BDB_DIR=""
+test "${BDB_INC}" = "yes" -o "${BDB_INC}" = "no" && BDB_INC=""
+test "${BDB_LIB}" = "yes" -o "${BDB_LIB}" = "no" && BDB_LIB=""
+
+if test -n "${BDB_DIR}" ; then
+   test ! -d "${BDB_DIR}" && AC_MSG_ERROR([dir ${BDB_DIR} does not exist])
+   test -z "${BDB_INC}" -a -d "${BDB_DIR}/include" && \
+              BDB_INC="${BDB_DIR}/include"
+   test -z "${BDB_LIB}" -a -d "${BDB_DIR}/lib" && \
+              BDB_LIB="${BDB_DIR}/lib"
+fi
+
+# Make sure that we are not clobbering PKG_* var settings
+if test -z "{$PKG_LIBS}" ; then
+  if test -n "${BDB_LIB}" ; then
+    PKG_LIBS="-L${BDB_LIB} -ldb"
+  else
+    test -n "${HAVE_BDB_LIB}" && PKG_LIBS="-ldb"
+  fi
+fi
+
+if test -z "${PKG_CPPFLAGS}" ; then
+  if test -n "${BDB_INC}" ; then
+    PKG_CPPFLAGS="-I${BDB_INC}"
+    FOUND_INC="yes"
+  else
+    if test -n "${HAVE_BDB_INC}" ; then
+      PKG_CPPFLAGS=""
+      FOUND_INC="yes"
+    else
+      PKG_CPPFLAGS=""
+      FOUND_INC="no"
+    fi
+  fi
+fi 
+
+
+if test "${HAVE_GETOPT_LONG}" = "no" ; then
+   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DHAVE_GETOPT_LONG=0 "
+fi
+
+if test -z "${HAVE_BDB_LIB}" -a -z "${PKG_LIBS}" ; then
+  #for dir in /usr/local/BerkeleyDB.4.7/lib /usr/local/lib64 /usr/lib64 \
+  for dir in /usr/local/lib64 /usr/lib64 \
+             /usr/local/lib /usr/lib /opt/lib
+  do  unset ac_cv_lib_db
+      AC_CHECK_LIB(db,db_version,
+                    HAVE_BDB_LIB="${dir}",
+                    HAVE_BDB_LIB="",
+                    [-L${dir}])
+      if test -n "{HAVE_BDB_LIB}" ; then
+         echo "            libdb found in -L${HAVE_BDB_LIB}"
+         PKG_LIBS="-L${HAVE_BDB_LIB} -ldb"
+         break
+      fi
+  done
+fi
+# headers
+if test -z "{$HAVE_BDB_INC}" -a -z "${PKG_CPPFLAGS}" ; then
+  #for dir in /usr/local/BerkeleyDB.4.7/include \
+  for dir in /usr/include /usr/local/include /opt/include /include
+  do
+      AC_CHECK_HEADER(${dir}/db.h,
+                      HAVE_BDB_INC="${dir}",
+                      HAVE_BDB_INC="")
+      if test -n "${HAVE_BDB_INC}" ; then
+        PKG_CPPFLAGS="-I${HAVE_BDB_INC}"
+        FOUND_INC="yes"
+        break
+      fi
+  done
+fi        
+
+AC_SUBST(PKG_CPPFLAGS)
+AC_SUBST(PKG_LIBS)
+
+AC_OUTPUT(src/Makevars)

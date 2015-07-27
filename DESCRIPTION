@@ -1,0 +1,18 @@
+Package: RBerkeley
+Type: Package
+Title: Oracle Berkeley DB Interface forR
+Version: 0.7-5
+Date: 2011-02-14
+Author: Jeffrey A. Ryan
+SystemRequirements: Oracle Berkeley DB 11gR2
+Maintainer: Bob Rudis <bob@rudis.net>
+Description: Berkeley DB is a family of embedded key-value database
+    libraries providing scalable high-performance data management services
+    to applications. The Berkeley DB products use simple function-call APIs
+    for data access and management. This pacakge provides an R interface to
+    the Berkeley DB API.
+License: GPL-3
+Packaged: 2011-02-15 04:00:18 UTC; jryan
+OS_type: unix
+Repository: CRAN
+Date/Publication: 2011-02-15 09:51:57

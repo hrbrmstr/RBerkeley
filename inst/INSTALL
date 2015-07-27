@@ -1,0 +1,42 @@
+To install RBerkeley, it is required that you have the BerkeleyDB 4.7.25
+version or greater installed in the standard place. Other versions may or may
+not work, depending on supported features.
+
+At present, only *nix systems have been tested, including
+Ubuntu and OSX.  Other systems and Windows builds are desired,
+but are not an internal priority.  Contributors welcome!
+
+It is currently set to the default installation location of DB when
+built from source.  If yours differs, please change the environment
+variables accordingly:
+
+    PKG_LIBS= -L/usr/local/BerkeleyDB.4.7/lib -ldb
+    PKG_CFLAGS= -I/usr/local/BerkeleyDB.4.7/include
+
+#  NOTE:  This doesn't seem to work correctly anymore
+#
+#Alternately, one may pass configuration parameters to
+#R CMD INSTALL with '--configure-args'
+#
+#    R CMD INSTALL \
+#      --configure-args="--with-berkeleydb-lib=-L/usr/local/lib \
+#                        --with-berkeleydb-inc=-I/usr/local/include" \
+#      RBerkeley_*.*-*.tar.gz
+
+The configure script will attempt to locate a usable
+DB installation (including headers) automatically.  If
+this fails, it is recommended to try the above methods,
+and if further issues occur, to email the package maintainer
+with a report of the problems encountered.
+
+A final step required to successfully load and run the software
+will be to add the DB library path to your linker if the
+library is in a non-standard location:
+
+Using something like:
+
+bash$ export LD_LIBRARY_PATH="/usr/local/BerkeleyDB.4.7/lib"
+
+or running ldconfig
+
+Good luck!

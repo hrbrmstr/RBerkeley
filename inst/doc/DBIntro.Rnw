@@ -1,0 +1,494 @@
+%\VignetteIndexEntry{RBerkeley: Getting Started with DB and R}
+\documentclass{article}
+\usepackage{hyperref}
+\hypersetup{colorlinks,%
+            citecolor=black,%
+            linkcolor=blue,%
+            urlcolor=blue,%
+            }
+\title{\bf RBerkeley: Getting Started with DB and R}
+\author{Jeffrey A. Ryan}
+\date{July 23, 2009}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Overview}
+Berkeley DB\cite{DB} is an embedded database application distributed
+by Oracle for use in open source and commercial applications.
+
+Widely deployed, Berkeley DB is used behind the scenes in
+many of the most popular applications and services in
+the world.  It is designed to be fast, memory-efficient, and
+fully ACID compliant.  Berkeley DB, also known commonly as DB,
+is shipped with APIs that allow for programatic access to
+its features.  These directly supported language interfaces
+include C, C++, Java and Tcl.  Contributed bindings exists
+in a variety of programming languages, including Perl, Python, and
+Ruby.
+
+RBerkeley adds an {\tt R}~\cite{R} language binding to this pool of options.
+
+This document is not to extoll the virtues of DB, but rather to
+provide a quick start to using the {\tt R} interface.  The general design
+philosophy of RBerkeley will be explained, and some small examples
+of using it in practice will be worked.
+
+At present a large part of the very large API has been incorporated
+into RBerkeley, including support for most database functions, cursors,
+environments and mutexes.  Not yet supported, though in development,
+are transactions, locks, and the rest of the API.
+
+\section{Design Philosophy}
+The RBerkeley interface is designed to be as close
+to the native C API as possible.  Naming conventions are
+maintained, with some simple substitutions to allow for legal
+{\tt R} function names.  Most of the functionality exposed at
+the R level is simply a thin wrapper to an internal call
+to the C wrapper around the C API calls.
+
+Some additional functionality and function calls are
+included to offer a more seamless user experience, as
+well as provide a more direct connection to the syntax of
+the C API, so as the official Oracle documentation can be used
+once a basic syntax conversion is performed.
+
+\section{Getting DB and RBerkeley}
+Berkeley DB is most likely already available on your
+system if you are running a unix or linux variant. The
+location of the library files are system dependant, and
+at present the configure script included with RBerkeley
+tries to identify the correct locations.
+
+\subsection*{Installing DB}
+It is relatively simple to install the newest version
+of DB directly from Oracle by following the instructions
+included in the download from Oracle.  The remainder of this
+section will assume the default location on POSIX systems. You
+may need to alter your configuration files to build RBerkeley.
+
+\subsection*{Installing RBerkeley}
+Installing RBerkeley follows the standard R installation convention
+of:
+
+{\tt R CMD INSTALL RBerkeley\_0.7-0.tar.gz}
+
+
+\noindent
+[Additional details coming...]
+
+\section{Database Basics}
+The primary purpose of this document is not to
+show how to use DB, that is
+best understood by reading the official Oracle documentation.
+Our intention is instead to show basic usage patterns,
+from the R environment, using the RBerkeley package interface.
+
+To begin, we will create a new database, add some R objects
+to it and read them back.  This will give the most simplistic
+use case.
+
+\subsection{Opening a Database}
+Here we create a new database handle, and open our test database.
+<<loadRBerkeley, echo=FALSE>>=
+library(RBerkeley)
+if(file.exists("myDB.db")) {
+  unlink("myDB.db")
+}
+@
+
+<<dbopen, keep.source=FALSE>>=
+dbh <- db_create()
+dbh
+@
+{\tt db\_create} can take some
+additional parameters, but we use the defaults here.  The object returned
+is of class {\tt DB}.
+
+Next we open the database:
+<<dbopen, keep.source=FALSE>>=
+ret <- db_open(dbh, txnid=NULL, file="myDB.db", type="BTREE", flags=mkFlags(DB_CREATE, DB_EXCL))
+db_strerror(ret)
+@
+
+The {\tt db\_open} call opens the underlying database. As with db\_create,
+different parameters may be passed in. Some of these options will
+be covered in later documentation, but for now the defaults are sufficient.
+Users are directed to the official API\cite{API} for usage details.
+
+\vspace{3mm}
+\noindent
+The return value from the {\tt db\_open} call is an integer value.
+This is the behavior of the underlying API. The utility function
+{\tt db\_strerror} can take this value and return a message to
+R.  Additional error and message tools are available in the API, though
+currently disabled.
+
+\vspace{3mm}
+\noindent
+The {\tt \textcolor{blue}{dbh}} argument is the database handle (a {\bf DB} struct in the
+official API).  This is from the previous {\tt db\_create} call.
+
+\vspace{3mm}
+\noindent
+The {\tt \textcolor{blue}{txnid}} is the transaction handle (a {\bf DB\_TXN} struct in the
+official API).  This may be specified as NULL if no transaction
+capability is needed, and in the current version of RBerkeley transaction
+support is disabled, so this needs to be passed as {\tt txnid=NULL}.
+
+\vspace{3mm}
+\noindent
+The {\tt \textcolor{blue}{file}} argument is simply the name of the database we wish to open. 
+
+\vspace{3mm}
+\noindent
+The {\tt \textcolor{blue}{type}} can
+be one of any supported DB access methods.  These include BTREE, HASH, RECNO,
+QUEUE or UNKNOWN, the latter for opening a database of unknown type.
+The {\tt db\_open} function will accept a variety of variations
+on these names, see that function for details.
+
+\vspace{3mm}
+\noindent
+The {\tt \textcolor{blue}{flags}} argument in this example is used to
+create the underlying database file if needed, i.e. if one is not present,
+[{\bf DB\_CREATE}], but \emph{if and only if} one is not present [{\bf DB\_EXCL}]. Flags
+are central to many of the advanced features in DB, and it is crucial to
+understand what you can and can't specify.  Once again, the main
+API documentation should be the considered the definitive guide.
+
+One interesting non-API function found in RBerkeley is {\tt mkFlags}; this function provides
+access to the internal constants defined by DB for use as flag
+parameters to be passed to many of the internal functions. 
+
+The C API allows for flags to be constructed via bitwise OR operations
+on predefined DB constants.  In order to not map all constants into R, which
+would be tedious, error-prone, and difficult to maintain, the
+RBerkeley package passes a list of quoted or unquoted names from mkFlags
+into C code which in turn performs this bitwise operation.  {\tt mkFlags} thus
+allows for syntax very close in look and feel to the base C API, and at
+the same time makes for a robust and safe mechanism to pass 
+arbitrary combinations of flags correctly.  
+
+<<mkFlags, keep.source=TRUE>>=
+mkFlags(DB_CREATE)
+mkFlags(DB_EXCL)
+mkFlags(DB_CREATE,DB_EXCL)
+mkFlags(DB_CREATE,DB_EXCL,DB_EXCL) # bitwise OR duplicates: no change
+@
+
+A programming note about this interface:
+unquoted symbols are converted to character vectors and in turn concatenated into one
+vector that is passed into the C level mkFlags function.  If illegal values are passed
+they will simply be ignored in the calculation, and will produce a visible warning
+regarding the specific invalid flag or flags that failed to be processed.
+The return value will be unaffected by improper or duplicate settings.
+
+\subsection{Adding Records}
+A database needs to have content, if it is to be of use.
+Berkeley DB stores records in databases as simple key-value pairs.  These
+records can be organized with a variety of access schemes, all of which are
+discussed at length in the official documentation.
+
+The central difference between records in DB and records in a typical
+relational database is that DB has no notion of type.  Records, both
+key and data are simply byte-strings.  This provides tremendous flexibility
+to the programmer, as it enables data to be stored in the most
+natural format possible, or in a manner that is most in accordance with
+expected usage patterns.
+
+Byte-strings make it quite easy to store native R objects as \emph{key} or
+\emph{data}, making additional processing unecessary.  Of course this also
+leaves open the possibility of
+creating a preprocessing model to match any arbitrary schema that is needed
+by the final application.
+
+The primary difference in the RBerkeley implementation of the DB API
+is that most R objects are passed to R's {\tt serialize} before being
+sent to the database. At the DB level, the API simply takes whatever
+raw data is passed in without effort to process.
+The only exception is for the R object type {\tt raw}
+which is passed in {\emph as is}.  This convention allows for simplicity of use
+from within R, yet offers the benefit of providing a direct interface
+to the underlying flexibility of DB if the application/programmer
+demands it.  All DB data must be be serialized, so this conversion from
+R objects (always represented as type RAW internally by RBerkeley) to bytes 
+is carried out in the package's C layer.
+
+To add a record, the package and API support two primary functions:
+{\tt db\_put} and {\tt dbcursor\_put}.  These correspond to the official
+API functions {\tt DB->put} and {\tt DBcursor->put}, respectively.  We'll
+take a look at each individually, as well as introduce the concept of the
+DB cursor.
+
+\subsubsection{db\_put \emph{aka} DB->put}
+The most basic way to add data into a database is with {\tt db\_put}.
+This takes a handful of arguments and adds a new record into the database,
+and returns as is usual for most of the API, an integer value of the success
+or failure.
+
+An example or two is the best way to understand how to use.
+
+<<dbput>>=
+db_put(dbh, key="Ross", data="Ihaka")
+db_put(dbh, key="Robert", data="Gentleman")
+@
+
+This takes the two R character vectors, and adds them as a key and data into
+our database referenced by the {\tt dbh} handle we created earlier.
+
+Internally it should be noted that it is the actual object being stored, after
+being run through {\tt serialize}, and not the characters themselves.
+If one wanted to simply store the raw character values, instead of R objects,
+he could convert to a raw vector before passing into db\_put.
+
+<<dbputraw>>=
+db_put(dbh,key=charToRaw("Ross"),data=charToRaw("Ihaka"))
+charToRaw("Ihaka")
+@
+
+\subsubsection{Cursors}
+A second slightly more abstract way of adding keys is to use a cursor.
+A cursor in database terminology is really nothing more than a pointer
+to a record.  A cursor can traverse a database, and provides a host
+of retrieval options that simply using {\tt db\_put} would be impossible for.
+
+Using cursors or even explaining much beyond the above is outside the scope
+of this document. The preceeding description should be sufficient to 
+have a cursory understanding
+what is happening internally. Yes, cursory.
+
+To add a record with a cursor, we first need a valid cursor handle to our
+database.  This is accomplished with a call to {\tt db\_cursor} using
+a valid {\tt dbh} handle to an open database.
+
+<<dbcursor>>=
+dbc <- db_cursor(dbh)
+@
+
+As with most API calls, there are numerous argument that may be passed into
+the creation call.  The cursor (mapping to the C API struct {\bf DBC})
+is now ready for use.
+
+To put a record in the database, we now use the appropriate {\emph cursor} method:
+
+<<dbcursorput>>=
+dbcursor_put(dbc, key=100L, data=5L, flags=mkFlags(DB_KEYLAST))
+@
+
+Again, the return value of 0 is an indicator of success.
+
+Some important points regarding the flags allowed need to
+be understood.  It is imperative to understand the underlying
+DB functionality before using cursors. 
+
+\subsection{Retrieving Records}
+As with putting records in a database, we can retrieve records
+through two different mechanisms as well. The is the standard
+database retrieval method for DB that is via the DB->get method, 
+available in RBerkeley via {\tt db\_get}.  The second
+method works with cursors, as we had seen before.  As before
+these methods may be used together, or exclusively.
+
+\subsubsection{db\_get \emph{aka} DB->get}
+The `standard' way to fetch records from a database
+would be with the {\tt db\_get} method.  This only requires
+a open database, and a functioning database handle (internally
+a pointer to a struct {\bf DB}, for those following
+allong with the official documentation).
+
+Depending on the flags specified to the db\_get function
+it is possible to perform more advanced operations than
+the following examples will cover.  By default, {\tt flags=0L}
+for all calls not specifying a flag argument.
+
+In the present version of RBerkeley, transaction support is
+disabled, and must be set to NULL. If not specified, this is the
+default.
+
+<<dbget1>>=
+db_get(dbh, key=100L)
+@
+
+As only raw values are stored by DB and RBerkeley, it is
+up to the calling code to interpret the resultant output.
+By default, the original \emph{put} calls serialize
+the R objects.  There is no default behavior for \emph{get}.
+If the object was serialized with R's {\tt serialize} function (the default)
+simply wrapping {\tt db\_get} with {\tt unserialize} will return the
+original object.
+
+<<dbget2>>=
+unserialize(db_get(dbh, key=100L))
+@
+
+Only the data value associated with the given key is returned.
+To access data that is stored under duplicate (identical) keys, or perform
+more advanced query operations including partial matching, it is
+necessary to use cursors.
+
+\subsubsection{Cursors}
+Cursor \emph{get} functions are similar to the simpler
+database get functions, in that a data value is
+returned for a given key.
+
+Cursors can be far more flexible if need be. For instance, it is possible
+to iterate over all key/data pairs in a given database, simply
+by passing {\tt NULL} for the key and data arguments.  Flags are
+once again critical to the behavior of the queries.
+
+The transaction support (currently disabled in RBerkeley) is
+set at the instantiation of the cursor, and therefore there
+is no {\tt txnid} argument to cursor \emph{get} calls.
+A few example to illustrate some behavior: 
+
+<<dbcursorget-1>>=
+res <- dbcursor_get(dbc, n=1)
+res
+@
+
+This retrieves the current value at the current cursor position.
+One notable difference with cursor calls versus standard {\tt db\_get}
+is that a list of key/data results are returned. Each element
+of the list is a list containing an element named `key' with the value
+of the key, and an element names `data' with the value of the data.
+Multiple elements would produce a list of length \emph{n}, where
+\emph{n} would be the lesser of the `n' value specified, or the number
+of records returned by the query.
+
+Another item of note is that the returned values contained as
+elements of the list are still in {\tt RAW} form.  Unserializing
+or otherwise converting into R objects would be the final step
+in most applications.
+
+<<resunserialize>>=
+lapply(res[[1]], unserialize)
+@
+
+It is also possible to find a specific record by using the DB\_SET flag
+and specifying a key. This is similar to the traditional
+{\tt db\_get} results, though with the key returned as well.
+
+<<dbcursorget-2>>=
+dbcursor_get(dbc, key="Ross", flags=mkFlags("DB_SET"))
+@
+
+The {\tt data} argument to the {\tt dbcursor\_get} function
+may be used to further specify a query. The main Oracle
+documentation should be referenced here, but a few examples will
+once again be illustrative.
+
+<<dbcursorget-3>>=
+res <- dbcursor_get(dbc, key="Ross", data="Brawn", flags=mkFlags("DB_SET"))
+lapply(res[[1]], unserialize)
+@
+
+The above call, as you will note, returns something other than the data we
+were requesting. This is a result of the {\tt flags} argument
+being set to \emph{DB\_SET}. DB simply returns key/data for the first element
+to match the key.
+
+To prevent this behavior, set {\tt flags=mkFlags("DB\_GET\_BOTH")}.
+<<dbcursorget-4>>=
+dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_GET_BOTH"))
+@
+
+Cursors can also be useful for iterating over a database's key/data
+records.  To iterate over the entire database, it is necessary to have
+a new (uninitialized) cursor.  Closing and re-opening the original
+cursor object would be just as good as creating a new one in most cases.
+
+<<dbcursornew>>=
+dbcursor_close(dbc)
+dbc <- db_cursor(dbh)
+res <- dbcursor_get(dbc, flags=mkFlags("DB_NEXT"), n=100)
+res
+@
+
+Given the output returns, and with knowledge of the data contained, we
+can use the R language to easily find the keys in our database. We'll exclude
+the first record, as we didn't use serialize in that entry. Just like
+any storage, knowledge of your data is critical to proper processing.
+
+<<dbkeys>>=
+sapply(res[-1], function(x) unserialize(x$key))
+@
+
+\subsection{Removing Records}
+Sometimes it may be necessary to remove records from the database. As with
+\emph{put} and \emph{get} functionality, we can delete records
+using standard {\bf DB} methods or use cursors.  A few example on how this is done;
+
+\subsubsection{db\_del \emph{aka} DB->del}
+The basic DB method removes all records (duplicates included) matching
+the {\tt key} argument.  The function is quite
+straightforward. The {\tt flags} argument, currently unused, must be set to zero
+or remain unspecified. The function returns the standard DB error values
+as integers.
+
+As an example, this will check to see if a key exists before we delete it, delete it, then check
+again.
+
+<<dbdel>>=
+db_strerror(db_exists(dbh, key=charToRaw("Ross")))
+db_del(dbh, key=charToRaw("Ross"))
+db_strerror(db_exists(dbh, key=charToRaw("Ross")))
+@
+
+\subsubsection{Cursors}
+An alternative approach, though a bit less obvious, is to use cursors.
+Cursor deletes will simply delete the record at
+the cursor's current position. There is no key argument, and the flags
+argument must be set to zero, per the DB API.
+
+To delete the first record in the database, position the cursor
+using {\tt dbcursor\_get} with the flags argument set to ``DB\_FIRST''.
+Then call the cursor delete function.
+
+<<dbcursordel>>=
+firstrecord <- dbcursor_get(dbc, flags=mkFlags("DB_FIRST"))[[1]]
+db_strerror(dbcursor_del(dbc))
+dbcursor_get(dbc, key=firstrecord$key, flags=mkFlags("DB_SET"))
+@
+
+\subsection{Closing a Database}
+To ensure data integrity, in a persistant state, it is required
+to close a database and open cursors before exiting a session.
+
+A database needs to have no open cursors in it in order to
+be closed, so it is first important to close any outstanding
+cursors we have created. After that, we may simply call {\tt db\_close}
+on the open database handle.  A warning about being unable to use
+either cursor or database handle will be issued once the method is called.
+
+<<close>>=
+dbcursor_close(dbc)
+db_close(dbh)
+@
+\section{Conclusion}
+RBerkeley provides low-level API access to the Berkeley DB 
+embedded database library. While this document merely touched on
+basic usage, a full suite of API functionality is available
+to the R user via the 80+ functions currently shipped
+with the RBerkeley package.
+
+Testing, documentation, and further methods will be added in
+upcoming RBerkeley version.
+
+\begin{thebibliography}{99}
+\bibitem{R} R Development Core Team:
+\emph{R: A Language and Environment for Statistical Computing},
+R Foundation for Statistical Computing, Vienna, Austria.
+ISBN 3-900051-07-0, URL \url{http://www.R-project.org}
+
+\bibitem{DB} Oracle Berkeley DB 4.7.25:
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}
+
+\bibitem{API} Oracle Berkeley DB C API:
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api\_c/frame.html}
+
+\end{thebibliography}
+\end{document}
+
