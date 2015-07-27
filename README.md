@@ -1,5 +1,5 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-This is the resurrected code for the RBerkeley which has been archived on 2014-09-19 as vignette locations were never updated for R 3.1.0. We refer to/use it in [Data-Driven Security](http://dds.ec/) so I felt somewhat responsible to keep it going.
+This is the resurrected code for the RBerkeley which had been archived on 2014-09-19 as vignette locations were never updated for R 3.1.0. We refer to/use it in [Data-Driven Security](http://dds.ec/) so I felt somewhat responsible to keep it going.
 
 I've changed the autoconf and C source setup a bit for lidbdb \> 4.
 
