@@ -652,10 +652,10 @@ SEXP rberkeley_db_stat (SEXP _dbp, SEXP _txnid, SEXP _flags)
   DB_BTREE_STAT  *bt=NULL;
   DB_QUEUE_STAT  *qs=NULL;
   switch(type) {
-
+#if defined DB_VERSION_MAJOR && DB_VERSION_MAJOR >= 5
     case DB_HEAP:
      break;
-
+#endif
     case DB_HASH:
       dbp->stat(dbp, txnid, &hash, flags);
       PROTECT(DBstat = allocVector(VECSXP,16));

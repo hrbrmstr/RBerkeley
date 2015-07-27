@@ -190,7 +190,7 @@ AC_DEFUN([AX_BERKELEY_DB],
 ])
 
 
-AX_BERKELEY_DB([4.6],,[exit 1]])
+AX_BERKELEY_DB([4.6],,[AC_MSG_ERROR([Sorry, you need BerkleyDB. Please look for distribution packages(libdb-dev) or get it from http://www.oracle.com/technetwork/database/berkeleydb/])])
 
 AC_SUBST([CXXFLAGS],["${DB_CPPFLAGS} ${CXXFLAGS}"])
 AC_SUBST([CPPFLAGS],["${DB_CPPFLAGS} ${CPPFLAGS}"])

@@ -2834,7 +2834,7 @@ rm -f core conftest.err conftest.$ac_objext \
 $as_echo "not found" >&6; }
     DB_LDFLAGS=""
     DB_CFLAGS=""
-    exit 1]
+    as_fn_error $? "Sorry, you need BerkleyDB. Please look for distribution packages(libdb-dev) or get it from http://www.oracle.com/technetwork/database/berkeleydb/" "$LINENO" 5
   else
 
 cat >>confdefs.h <<_ACEOF
