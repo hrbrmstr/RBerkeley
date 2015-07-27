@@ -1,108 +1,203 @@
-# Configuration file based on RMySQL package configure.in
-# written by J Horner.
-# Additional insight provided by Dirk Eddelbuettel.
-# All bad form/function is solely the work of Jeff Ryan
+# -*- mode: autoconf; indent-tabs-mode: nil; autoconf-indentation: 2; tab-width: 2; -*- ***
+#
+# $Id$
 
-AC_INIT(RBerkeley, 0.7-0)
+# require at least autoconf 2.50
+AC_PREREQ(2.60)
 
-AC_PROG_CC
+# Process this file with autoconf to produce a configure script.
+define([pkgversion], esyscmd([sh -c "grep Version: DESCRIPTION | cut -d' ' -f2 | tr -d '\n'"]))dnl
+define([maintainer], esyscmd([sh -c "grep Maintainer: DESCRIPTION | sed -e 's/^Maintainer: //' | tr -d '\n'"]))dnl
+AC_INIT(RBerkeley, [pkgversion], [maintainer])
 
-AC_CHECK_LIB(c,getopt_long,
-             HAVE_GETOPT_LONG="yes",
-             HAVE_GETOPT_LONG="no")
+# Check of R
+AC_DEFUN(AC_PROG_R, [AC_CHECK_PROG(R,R,yes)])
+AC_PROG_R
 
-AC_CHECK_LIB(db,
-             HAVE_BDB_LIB="yes",
-             HAVE_BDB_LIB="")
+# Next segment by Kurt, and once contributed to RQuantLib
+: ${R_HOME=`R RHOME`}
+if test -z "${R_HOME}"; then
+    AC_MSG_ERROR([Could not determine R_HOME.])
+fi
+CXX=`${R_HOME}/bin/R CMD config CXX`
+CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
 
-AC_CHECK_HEADERS(db.h,
-                 HAVE_BDB_INC="yes",
-                 HAVE_BDB_INC="")
+## look for Rscript, but use the one found via R_HOME to allow for multiple installations
+AC_DEFUN(AC_PROG_RSCRIPT, [AC_CHECK_PROG(RSCRIPT,Rscript,yes)])
+AC_PROG_RSCRIPT
+if test x"${RSCRIPT}" == x"yes" ; then
+    ## AC_MSG_RESULT([yes])
+    ## link flag providing libary as well as path to library, and optionally rpath
+    RCPP_LDFLAGS=`${R_HOME}/bin/Rscript -e 'Rcpp:::LdFlags()'`
+else
+    #AC_MSG_RESULT([no])
+    echo "
+  Your installation does not appear to have Rscript installed.
 
-AC_ARG_WITH(berkeleydb-dir,
-            [--with-berkeleydb-dir=BDB_DIR specifies existing Berkeley DB base dir],
-            BDB_DIR="${with_berkeleydb_dir}")
-AC_ARG_WITH(berkeleydb-inc,
-            [--with-berkeleydb-inc=BDB_INC specifies existing Berkeley DB include dir],
-            BDB_INC="${with_berkeleydb_inc}")
-AC_ARG_WITH(berkeleydb-lib,
-            [--with-berkeleydb-lib=BDB_LIB specifies existing Berkeley DB lib dir],
-            BDB_LIB="${with_berkeleydb_lib}")
-
-test "${BDB_DIR}" = "yes" -o "${BDB_DIR}" = "no" && BDB_DIR=""
-test "${BDB_INC}" = "yes" -o "${BDB_INC}" = "no" && BDB_INC=""
-test "${BDB_LIB}" = "yes" -o "${BDB_LIB}" = "no" && BDB_LIB=""
-
-if test -n "${BDB_DIR}" ; then
-   test ! -d "${BDB_DIR}" && AC_MSG_ERROR([dir ${BDB_DIR} does not exist])
-   test -z "${BDB_INC}" -a -d "${BDB_DIR}/include" && \
-              BDB_INC="${BDB_DIR}/include"
-   test -z "${BDB_LIB}" -a -d "${BDB_DIR}/lib" && \
-              BDB_LIB="${BDB_DIR}/lib"
+  Please make sure that you have a working and complete R installation.
+"
+    exit 1
 fi
 
-# Make sure that we are not clobbering PKG_* var settings
-if test -z "{$PKG_LIBS}" ; then
-  if test -n "${BDB_LIB}" ; then
-    PKG_LIBS="-L${BDB_LIB} -ldb"
+
+# ===========================================================================
+#      http://www.gnu.org/software/autoconf-archive/ax_berkeley_db.html
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_BERKELEY_DB([MINIMUM-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
+#
+# DESCRIPTION
+#
+#   This macro tries to find Berkeley DB. It honors MINIMUM-VERSION if
+#   given.
+#
+#   If libdb is found, DB_HEADER and DB_LIBS variables are set and
+#   ACTION-IF-FOUND shell code is executed if specified. DB_HEADER is set to
+#   location of db.h header in quotes (e.g. "db3/db.h") and
+#   AC_DEFINE_UNQUOTED is called on it, so that you can type
+#
+#     #include DB_HEADER
+#
+#   in your C/C++ code. DB_LIBS is set to linker flags needed to link
+#   against the library (e.g. -ldb3.1) and AC_SUBST is called on it.
+#
+#   when specified user-selected spot (via --with-libdb) also sets
+#
+#     DB_CPPFLAGS to the include directives required
+#     DB_LDFLAGS to the -L flags required
+#
+# LICENSE
+#
+#   Copyright (c) 2008 Vaclav Slavik <vaclav.slavik@matfyz.cz>
+#   Copyright (c) 2014 Kirill A. Korinskiy <catap@catap.ru>
+#
+#   Copying and distribution of this file, with or without modification, are
+#   permitted in any medium without royalty provided the copyright notice
+#   and this notice are preserved. This file is offered as-is, without any
+#   warranty.
+
+#serial 7
+
+AC_DEFUN([AX_BERKELEY_DB],
+[
+  old_LIBS="$LIBS"
+  old_LDFLAGS="$LDFLAGS"
+  old_CFLAGS="$CFLAGS"
+
+  libdbdir=""
+  AC_ARG_WITH(libdb,
+    AS_HELP_STRING([--with-libdb=DIR],
+        [root of the Berkeley DB directory]),
+    [
+        case "$withval" in
+        "" | y | ye | yes | n | no)
+        AC_MSG_ERROR([Invalid --with-libdb value])
+          ;;
+        *) libdbdir="$withval"
+          ;;
+        esac
+    ], [])
+
+  minversion=ifelse([$1], ,,$1)
+
+  DB_HEADER=""
+  DB_LIBS=""
+  DB_LDFLAGS=""
+  DB_CFLAGS=""
+
+  if test -z $minversion ; then
+      minvermajor=0
+      minverminor=0
+      minverpatch=0
+      AC_MSG_CHECKING([for Berkeley DB])
   else
-    test -n "${HAVE_BDB_LIB}" && PKG_LIBS="-ldb"
+      minvermajor=`echo $minversion | cut -d. -f1`
+      minverminor=`echo $minversion | cut -d. -f2`
+      minverpatch=`echo $minversion | cut -d. -f3`
+      minvermajor=${minvermajor:-0}
+      minverminor=${minverminor:-0}
+      minverpatch=${minverpatch:-0}
+      AC_MSG_CHECKING([for Berkeley DB >= $minversion])
   fi
-fi
 
-if test -z "${PKG_CPPFLAGS}" ; then
-  if test -n "${BDB_INC}" ; then
-    PKG_CPPFLAGS="-I${BDB_INC}"
-    FOUND_INC="yes"
-  else
-    if test -n "${HAVE_BDB_INC}" ; then
-      PKG_CPPFLAGS=""
-      FOUND_INC="yes"
+  if test x$libdbdir != x""; then
+    DB_CFLAGS="-I${libdbdir}/include"
+    DB_LDFLAGS="-L${libdbdir}/lib"
+    LDFLAGS="$DB_LDFLAGS $old_LDFLAGS"
+    CFLAGS="$DB_CFLAGS $old_CPPFLAGS"
+  fi
+
+  for version in "" 5.0 4.9 4.8 4.7 4.6 4.5 4.4 4.3 4.2 4.1 4.0 3.6 3.5 3.4 3.3 3.2 3.1 ; do
+
+    if test -z $version ; then
+        db_lib="-ldb"
+        try_headers="db.h"
     else
-      PKG_CPPFLAGS=""
-      FOUND_INC="no"
+        db_lib="-ldb-$version"
+        try_headers="db$version/db.h db`echo $version | sed -e 's,\..*,,g'`/db.h"
     fi
+
+    LIBS="$old_LIBS $db_lib"
+
+    for db_hdr in $try_headers ; do
+        if test -z $DB_HEADER ; then
+            AC_LINK_IFELSE(
+                [AC_LANG_PROGRAM(
+                    [
+                        #include <${db_hdr}>
+                    ],
+                    [
+                        #if !((DB_VERSION_MAJOR > (${minvermajor}) || \
+                              (DB_VERSION_MAJOR == (${minvermajor}) && \
+                                    DB_VERSION_MINOR > (${minverminor})) || \
+                              (DB_VERSION_MAJOR == (${minvermajor}) && \
+                                    DB_VERSION_MINOR == (${minverminor}) && \
+                                    DB_VERSION_PATCH >= (${minverpatch}))))
+                            #error "too old version"
+                        #endif
+
+                        DB *db;
+                        db_create(&db, NULL, 0);
+                    ])],
+                [
+                    AC_MSG_RESULT([header $db_hdr, library $db_lib])
+
+                    DB_HEADER="$db_hdr"
+                    DB_LIBS="$db_lib"
+                ])
+        fi
+    done
+  done
+
+  LIBS="$old_LIBS"
+  LDFLAGS="$old_LDFLAGS"
+  CFLAGS="$old_CPPFLAGS"
+
+  if test -z $DB_HEADER ; then
+    AC_MSG_RESULT([not found])
+    DB_LDFLAGS=""
+    DB_CFLAGS=""
+    ifelse([$3], , :, [$3])
+  else
+    AC_DEFINE_UNQUOTED(DB_HEADER, ["$DB_HEADER"], ["Berkeley DB Header File"])
+    AC_SUBST(DB_LIBS)
+    AC_SUBST(DB_LDFLAGS)
+    AC_SUBST(DB_CFLAGS)
+    ifelse([$2], , :, [$2])
   fi
-fi 
+])
 
 
-if test "${HAVE_GETOPT_LONG}" = "no" ; then
-   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DHAVE_GETOPT_LONG=0 "
-fi
+AX_BERKELEY_DB
 
-if test -z "${HAVE_BDB_LIB}" -a -z "${PKG_LIBS}" ; then
-  #for dir in /usr/local/BerkeleyDB.4.7/lib /usr/local/lib64 /usr/lib64 \
-  for dir in /usr/local/lib64 /usr/lib64 \
-             /usr/local/lib /usr/lib /opt/lib
-  do  unset ac_cv_lib_db
-      AC_CHECK_LIB(db,db_version,
-                    HAVE_BDB_LIB="${dir}",
-                    HAVE_BDB_LIB="",
-                    [-L${dir}])
-      if test -n "{HAVE_BDB_LIB}" ; then
-         echo "            libdb found in -L${HAVE_BDB_LIB}"
-         PKG_LIBS="-L${HAVE_BDB_LIB} -ldb"
-         break
-      fi
-  done
-fi
-# headers
-if test -z "{$HAVE_BDB_INC}" -a -z "${PKG_CPPFLAGS}" ; then
-  #for dir in /usr/local/BerkeleyDB.4.7/include \
-  for dir in /usr/include /usr/local/include /opt/include /include
-  do
-      AC_CHECK_HEADER(${dir}/db.h,
-                      HAVE_BDB_INC="${dir}",
-                      HAVE_BDB_INC="")
-      if test -n "${HAVE_BDB_INC}" ; then
-        PKG_CPPFLAGS="-I${HAVE_BDB_INC}"
-        FOUND_INC="yes"
-        break
-      fi
-  done
-fi        
+AC_SUBST([CXXFLAGS],["${DB_CPPFLAGS} ${CXXFLAGS}"])
+AC_SUBST([CPPFLAGS],["${DB_CPPFLAGS} ${CPPFLAGS}"])
+AC_SUBST([LDFLAGS],["${DB_LDFLAGS} ${RCPP_LDFLAGS} ${LDFLAGS}"])
 
-AC_SUBST(PKG_CPPFLAGS)
-AC_SUBST(PKG_LIBS)
+AC_SUBST(CXXFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
 
 AC_OUTPUT(src/Makevars)

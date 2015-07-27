@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wswitch"
+
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>

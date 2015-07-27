@@ -1,10 +1,4 @@
-## set by configure
-#DB_CFLAGS  = @DB_CFLAGS@
-#DB_LIBS    = @DB_LIBS@
-#
-## combine to standard arguments for R
-#PKG_CFLAGS = -W $(DB_CFLAGS) 
-#PKG_LIBS   = $(DB_LIBS) 
-PKG_CPPFLAGS = @PKG_CPPFLAGS@
-PKG_LIBS = @PKG_LIBS@
+PKG_CPPFLAGS=@CXXFLAGS@ @CPPFLAGS@ -DNDEBUG -g
+PKG_LIBS=@LDFLAGS@ -ldb
+
 

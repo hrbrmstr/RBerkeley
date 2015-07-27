@@ -4,7 +4,7 @@ Title: Oracle 'Berkeley DB' Interface for R
 Version: 0.7-5
 Date: 2015-07-27
 Author: Jeffrey A. Ryan
-SystemRequirements: Oracle Berkeley DB 11gR2
+SystemRequirements: Oracle Berkeley DB 11gR2+
 Maintainer: Bob Rudis <bob@rudis.net>
 Description: Oracle Berkeley DB -
     <http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html> -
