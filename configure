@@ -2740,7 +2740,7 @@ if test "${with_libdb+set}" = set; then :
 fi
 
 
-  minversion=
+  minversion=4.6
 
   DB_HEADER=""
   DB_LIBS=""
@@ -2834,7 +2834,7 @@ rm -f core conftest.err conftest.$ac_objext \
 $as_echo "not found" >&6; }
     DB_LDFLAGS=""
     DB_CFLAGS=""
-    :
+    exit 1]
   else
 
 cat >>confdefs.h <<_ACEOF

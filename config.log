@@ -30,8 +30,8 @@ Kernel configured for up to 4 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3
 Primary memory available: 16.00 gigabytes
-Default processor set: 353 tasks, 1829 threads, 4 processors
-Load average: 3.04, Mach factor: 0.94
+Default processor set: 352 tasks, 1803 threads, 4 processors
+Load average: 2.98, Mach factor: 1.24
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
@@ -114,7 +114,7 @@ configure:2625: checking for gcc option to accept ISO C89
 configure:2688: gcc  -c -g -O2  conftest.c >&5
 configure:2688: $? = 0
 configure:2701: result: none needed
-configure:2754: checking for Berkeley DB
+configure:2763: checking for Berkeley DB >= 4.6
 configure:2813: gcc -o conftest -g -O2   conftest.c  -ldb >&5
 configure:2813: $? = 0
 configure:2815: result: header db.h, library -ldb
