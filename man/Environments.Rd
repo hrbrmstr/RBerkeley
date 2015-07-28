@@ -116,11 +116,11 @@ Varies by function call.
 }
 \references{
 Oracle Berkeley DB\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}\cr\cr
+\url{http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html}\cr\cr
 Oracle Berkeley DB C API\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/frame.html}\cr\cr
+\url{http://docs.oracle.com/cd/E17076_04/html/gsg/C/index.html}\cr\cr
 Oracle Berkeley DB Reference Guide\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/ref/toc.html}
+\url{http://docs.oracle.com/cd/E17076_04/html/index.html}
 }
 \author{
 Jeffrey A. Ryan for the R API

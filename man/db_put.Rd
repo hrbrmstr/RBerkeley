@@ -80,16 +80,16 @@ These functions are called for their database side effects.
 }
 \references{
 BerkeleyDB DB->put\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/db_put.html}\cr\cr
+\url{http://docs.oracle.com/cd/E17076_04/html/gsg/C/PutEntryWCursor.html}\cr\cr
 BerkeleyDB DB->get\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/db_get.html}
+\url{http://docs.oracle.com/cd/E17076_04/html/gsg/C/Positioning.html}
 }
 \author{
 Jeffrey A. Ryan
 }
 \note{
 Serialized objects in R have certain limitations with respect
-to underlying design considerations. 
+to underlying design considerations.
 }
 
 

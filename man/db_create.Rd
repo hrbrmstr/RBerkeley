@@ -27,7 +27,7 @@ A database handle.
 }
 \references{
 Oracle Berkeley DB API\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}\cr\cr
+\url{http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html}\cr\cr
 }
 \author{
 Jeffrey A. Ryan

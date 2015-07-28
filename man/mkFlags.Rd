@@ -47,7 +47,7 @@ An integer suitable for use as a \emph{flags} argument
 in the lower-level API calls.
 }
 \references{
-Oracle BerkeleyDB \url{http://www.oracle.com}
+Oracle BerkeleyDB \url{https://www.oracle.com}
 }
 \author{
 Jeffrey A. Ryan

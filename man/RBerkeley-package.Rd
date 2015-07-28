@@ -48,8 +48,8 @@ with an asterisk next to them are currently not available in the \R API.
 Jeffrey A. Ryan
 }
 \references{
-Oracle Berkey DB 11gR2\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}
+Oracle Berkey DB\cr
+\url{http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html}
 }
 \keyword{ package }
 \seealso{
@@ -87,7 +87,7 @@ db_key_range(dbh, key="myKey2")
 system.time(
 for(i in 1:1000)
 {
-  db_put(dbh, key=i, data=x) 
+  db_put(dbh, key=i, data=x)
 }
 )
 

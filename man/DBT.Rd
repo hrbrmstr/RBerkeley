@@ -50,7 +50,7 @@ A \code{DBT} object.
 }
 \references{
 Official Oracle Documentation for DBT structs:
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_reference/C/dbt.html}
+\url{http://docs.oracle.com/cd/E17076_04/html/gsg/C/cstructs.html}
 }
 \author{
 Jeffrey A. Ryan
