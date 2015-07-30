@@ -30,25 +30,21 @@ Kernel configured for up to 4 processors.
 Processor type: x86_64h (Intel x86-64h Haswell)
 Processors active: 0 1 2 3
 Primary memory available: 16.00 gigabytes
-Default processor set: 305 tasks, 1466 threads, 4 processors
-Load average: 3.47, Mach factor: 1.46
+Default processor set: 314 tasks, 1532 threads, 4 processors
+Load average: 1.48, Mach factor: 2.52
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
-PATH: /usr/local/sbin
-PATH: /Users/bob/bin
-PATH: ~/gocode/bin
-PATH: /usr/local/bin
 PATH: /usr/bin
 PATH: /bin
 PATH: /usr/sbin
 PATH: /sbin
+PATH: /usr/local/bin
 PATH: /opt/X11/bin
 PATH: /Applications/domino
 PATH: /usr/local/MacGPG2/bin
 PATH: /usr/texbin
-PATH: /usr/local/Cellar/go/1.4.2/libexec/bin
 
 
 ## ----------- ##

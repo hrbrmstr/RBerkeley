@@ -1,8 +1,8 @@
 Package: RBerkeley
 Type: Package
 Title: Oracle 'Berkeley DB' Interface for R
-Version: 0.7-5
-Date: 2015-07-28
+Version: 0.7-6
+Date: 2015-07-29
 Author: Jeffrey A. Ryan [aut, cre], Bob Rudis [ctb]
 SystemRequirements: Oracle Berkeley DB 11gR2+
 Maintainer: Bob Rudis <bob@rudis.net>
