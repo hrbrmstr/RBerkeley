@@ -334,3 +334,99 @@ NULL
 
 
 
+# In the previous version, exports were manually curated by hand in
+# the NAMESPACE file.  There's broad overlap between the things that
+# are listed in @aliases above and want to be @export'ed but it's
+# incomplete enough overlap that it's mostly confusing.  So exports
+# are listed in one big list here.
+#' @export db_close
+#' @export db_compact
+#' @export db_cursor
+#' @export db_del
+#' @export db_exists
+#' @export db_get
+#' @export db_getP
+#' @export db_get_byteswapped
+#' @export db_get_byteswapped
+#' @export db_get_cachesize
+#' @export db_get_dbname
+#' @export db_get_encrypt_flags
+#' @export db_get_encrypt_flags
+#' @export db_get_env
+#' @export db_get_errpfx
+#' @export db_get_flags
+#' @export db_get_lorder
+#' @export db_get_lorder
+#' @export db_get_mpf
+#' @export db_get_pagesize
+#' @export db_get_priority
+#' @export db_get_type
+#' @export db_key_range
+#' @export db_open
+#' @export db_remove
+#' @export db_rename
+#' @export db_set_cachesize
+#' @export db_set_encrypt
+#' @export db_set_encrypt
+#' @export db_set_errfile
+#' @export db_set_errpfx
+#' @export db_set_flags
+#' @export db_set_lorder
+#' @export db_set_lorder
+#' @export db_set_msgfile
+#' @export db_set_msgfile
+#' @export db_set_pagesize
+#' @export db_set_priority
+#' @export db_set_re_source
+#' @export db_set_re_source
+#' @export db_stat
+#' @export db_stat
+#' @export db_stat_print
+#' @export db_stat_print
+#' @export db_strerror
+#' @export db_sync
+#' @export db_truncate
+#' @export db_upgrade
+#' @export db_version
+#' @export dbcursor_close
+#' @export dbcursor_count
+#' @export dbcursor_del
+#' @export dbcursor_dup
+#' @export dbcursor_get
+#' @export dbcursor_get_priority
+#' @export dbcursor_put
+#' @export dbcursor_set_priority
+#' @export dbenv_close
+#' @export dbenv_dbremove
+#' @export dbenv_dbrename
+#' @export dbenv_get_cachesize
+#' @export dbenv_get_data_dirs
+#' @export dbenv_get_flags
+#' @export dbenv_get_home
+#' @export dbenv_get_intermediate_dir_mode
+#' @export dbenv_get_open_flags
+#' @export dbenv_get_shm_key
+#' @export dbenv_get_tmp_dir
+#' @export dbenv_get_verbose
+#' @export dbenv_memp_stat_print
+#' @export dbenv_mutex_alloc
+#' @export dbenv_mutex_free
+#' @export dbenv_mutex_lock
+#' @export dbenv_mutex_stat_print
+#' @export dbenv_mutex_unlock
+#' @export dbenv_open
+#' @export dbenv_remove
+#' @export dbenv_set_cachesize
+#' @export dbenv_set_data_dir
+#' @export dbenv_set_flags
+#' @export dbenv_set_intermediate_dir_mode
+#' @export dbenv_set_shm_key
+#' @export dbenv_set_tmp_dir
+#' @export dbenv_set_verbose
+#' @export dbenv_stat_print
+#' @export dbenv_txn_begin
+#' @export dbenv_txn_stat_print
+#' @export dbtxn_abort
+#' @export dbtxn_commit
+#' @export dbtxn_id
+NULL
