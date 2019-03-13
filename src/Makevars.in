@@ -1,2 +1,3 @@
-PKG_CPPFLAGS=@CXXFLAGS@ @CPPFLAGS@ -DNDEBUG -g
+#PKG_CPPFLAGS=@CXXFLAGS@ @CPPFLAGS@ -DNDEBUG -g  <This was generating warning as these flags are memorized by R and are used by default by Debian>
+PKG_CPPFLAGS=@CXXFLAGS@ @CPPFLAGS@ -DNDEBUG
 PKG_LIBS=@LDFLAGS@
