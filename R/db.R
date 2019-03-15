@@ -229,7 +229,7 @@ db_exists <- function(dbh, txnid=NULL, key, flags=0L) {
 db_truncate <- function(dhh) { }
 
 db_get_byteswapped <- function(dbh) {
-  .Call("rberkeley_db_get_byteswapped", dbh)
+  .Call("rberkeley_db_get_byteswapped", as.DB(dbh)) 
 }
 
 db_set_cachesize <- function(dbh, gbytes, bytes, ncache) {
