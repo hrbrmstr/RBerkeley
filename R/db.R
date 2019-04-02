@@ -315,11 +315,11 @@ db_get_type <- function(dbh) {
 }
 
 db_set_errpfx <- function(dbh, errpfx) {
-  .Call("rberkeley_db_set_errfx", as.DB(dbh), errpfx)
+  .Call("rberkeley_db_set_errpfx", as.DB(dbh), errpfx)
 }
 
 db_get_errpfx <- function(dbh) {
-  .Call("rberkeley_db_get_errfx", as.DB(dbh))
+  .Call("rberkeley_db_get_errpfx", as.DB(dbh))
 }
 
 db_set_errfile <- function(dbh, errfile) {
