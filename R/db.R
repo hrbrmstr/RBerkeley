@@ -326,14 +326,14 @@ db_set_errfile <- function(dbh, errfile) {
   if(!is.null(errfile) && !file.exists(errfile)) {
     if(!file.create(errfile)) stop(paste("could not create file"))
   }
-  .Call("rberkeley_db_set_errfile", dbh, errfile)
+  .Call("rberkeley_db_set_errfile", as.DB(dbh), errfile)
 }
 
 db_set_msgfile <- function(dbh, msgfile) {
   if(!is.null(msgfile) && !file.exists(msgfile)) {
     if(!file.create(msgfile)) stop(paste("could not create file"))
   }
-  .Call("rberkeley_db_set_msgfile", dbh, msgfile)
+  .Call("rberkeley_db_set_msgfile", as.DB(dbh), msgfile)
 }
 
 db_set_re_source <- function(dbh, source) {

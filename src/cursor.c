@@ -236,11 +236,11 @@ SEXP rberkeley_dbcursor_put (SEXP _dbc, SEXP _key, SEXP _data, SEXP _flags)
   int ret;
 
   flags = (u_int32_t)INTEGER(_flags)[0];
-  if(flags != DB_AFTER &&
-     flags != DB_BEFORE &&
-     flags != DB_CURRENT &&
-     flags != DB_KEYFIRST &&
-     flags != DB_KEYLAST &&
+  if(flags != DB_AFTER ||
+     flags != DB_BEFORE ||
+     flags != DB_CURRENT ||
+     flags != DB_KEYFIRST ||
+     flags != DB_KEYLAST ||
      flags != DB_NODUPDATA) {
     error("incorrect flags value");
   }
