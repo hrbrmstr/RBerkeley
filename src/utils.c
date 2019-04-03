@@ -1,8 +1,3 @@
-#pragma GCC diagnostic ignored "-Wswitch"
-
-#include <R.h>
-#include <Rinternals.h>
-#include <Rdefines.h>
 /* #include "db.h" */
 #include "config.h"
 #include DB_HEADER
